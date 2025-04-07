@@ -2,21 +2,21 @@ name: Continuous Delivery
 on:
   push:
     branches:
-      - main
+      - main  # or any other branch you want to trigger on
+
 jobs:
   deliver:
     runs-on: ubuntu-latest
     steps:
-
       - name: Check out repository code
         uses: actions/checkout@v4
 
       - name: Simulando Continuous Delivery
-        uses: actions/uploado-artifact@v4
+        uses: actions/upload-artifact@v4
         with:
           name: projetozipado.zip
           path: |
-            '**.py"
+            '**.py'
             README.md
 
   deploy:
@@ -28,3 +28,4 @@ jobs:
           name: projetozipado.zip
       - name: Display structure of downloaded files
         run: ls -R
+
