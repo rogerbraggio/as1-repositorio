@@ -2,7 +2,8 @@ name: Continuous Delivery
 on:
   push:
     branches:
-      - main # ou qualquer outra branch
+      - main  # or any other branch you want to trigger on
+
 jobs:
   deliver:
     runs-on: ubuntu-latest
@@ -17,4 +18,14 @@ jobs:
           path: |
             '**.py'
             README.md
-            
+
+  deploy:
+    runs-on: ubuntu-latest
+    needs: deliver
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: projetozipado.zip
+      - name: Display structure of downloaded files
+        run: ls -R
+
