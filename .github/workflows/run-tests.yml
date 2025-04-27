@@ -1,4 +1,4 @@
-name: Run Unit Tests and Send Discord Alert
+name: Run Unit Tests and Send Detailed Discord Alert
 
 on:
   pull_request:
@@ -22,23 +22,17 @@ jobs:
         python -m pip install --upgrade pip
         pip install pytest
 
-    - name: Run Unit Tests
-      id: run_tests
+    - name: Run Unit Tests and Save Output
+      id: tests
       run: |
-        pytest tests/
+        mkdir -p test-results
+        pytest tests/ --tb=short > test-results/output.txt || true
 
-    - name: Send Discord notification on success
-      if: success()
+    - name: Send Discord notification
       run: |
+        TEST_RESULTS=$(cat test-results/output.txt)
         curl -H "Content-Type: application/json" \
         -X POST \
-        -d "{\"content\": \"✅ Todos os testes passaram na Pull Request!\"}" \
+        -d "{\"content\": \"🧪 Resultado dos testes:\n\n$TEST_RESULTS\"}" \
         https://discordapp.com/api/webhooks/1366054302547972227/IiND9Xr2fBUcCkzon8B56RyuNzpZHqiYK3k-5xjkuSdB5yXReTKpAsHkiCseuz5SGXgm
 
-    - name: Send Discord notification on failure
-      if: failure()
-      run: |
-        curl -H "Content-Type: application/json" \
-        -X POST \
-        -d "{\"content\": \"❌ Houve uma falha nos testes da Pull Request!\"}" \
-        https://discordapp.com/api/webhooks/1366054302547972227/IiND9Xr2fBUcCkzon8B56RyuNzpZHqiYK3k-5xjkuSdB5yXReTKpAsHkiCseuz5SGXgm
