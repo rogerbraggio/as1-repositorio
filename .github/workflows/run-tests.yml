@@ -1,0 +1,44 @@
+name: Run Unit Tests and Send Discord Alert
+
+on:
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install pytest
+
+    - name: Run Unit Tests
+      id: run_tests
+      run: |
+        pytest tests/
+
+    - name: Send Discord notification on success
+      if: success()
+      run: |
+        curl -H "Content-Type: application/json" \
+        -X POST \
+        -d "{\"content\": \"✅ Todos os testes passaram na Pull Request!\"}" \
+        https://discordapp.com/api/webhooks/1366054302547972227/IiND9Xr2fBUcCkzon8B56RyuNzpZHqiYK3k-5xjkuSdB5yXReTKpAsHkiCseuz5SGXgm
+
+    - name: Send Discord notification on failure
+      if: failure()
+      run: |
+        curl -H "Content-Type: application/json" \
+        -X POST \
+        -d "{\"content\": \"❌ Houve uma falha nos testes da Pull Request!\"}" \
+        https://discordapp.com/api/webhooks/1366054302547972227/IiND9Xr2fBUcCkzon8B56RyuNzpZHqiYK3k-5xjkuSdB5yXReTKpAsHkiCseuz5SGXgm
